@@ -3,6 +3,8 @@ build/
 Debug/
 Release/
 ipch/
+.idea/
+cmake-build-debug/
 
 # Resources folder
 res/
