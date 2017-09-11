@@ -105,11 +105,19 @@ edaf80::Assignment1::run()
 
     earth.add_texture("diffuse_texture", earth_texture, GL_TEXTURE_2D);
 
+    auto emarble = Node();
+    emarble.set_geometry(sphere);
+    emarble.set_program(shader, [](GLuint /*program*/){});
+    auto emarble_texture = bonobo::loadTexture2D("marble.png");
+    emarble.add_texture("diffuse_texture", emarble_texture, GL_TEXTURE_2D);
+
+
     // Add node
     auto world = Node();
     world.add_child(&sun);
     world.add_child(&pivot);
     pivot.add_child(&earth);
+    earth.add_child(&emarble);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -143,9 +151,10 @@ edaf80::Assignment1::run()
         //sun.set_translation(glm::vec3(std::sin(nowTime), 0.0f, 0.0f));
         sun.rotate_y(std::sin(nowTime/(nowTime*10)));
 
-        earth.set_translation(glm::vec3(1.0f, 0.0f, 1.0f));
+        earth.set_translation(glm::vec3(3.5f, 0.0f, 1.0f));
+        emarble.set_translation(glm::vec3(1.5f, 0.0f, 1.0f));
         //earth.set_translation(glm::vec3(1.0f, 1.0f, 1.0f));
-        earth.set_scaling(glm::vec3(0.2f));
+        earth.set_scaling(glm::vec3(.7f));
         //earth.scale(glm::vec3(4.3f));
         //earth.set_rotation_y(.7);
         pivot.rotate_y(nowTime/(nowTime*30));
