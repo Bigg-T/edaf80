@@ -88,18 +88,30 @@ edaf80::Assignment1::run()
 	sun.set_program(shader, [](GLuint /*program*/){});
 	//
 	// Todo: Attach a texture to the sun
-	//
-
-	auto world = Node();
-	world.add_child(&sun);
+	// DONE
+    sun.add_texture("diffuse_texture", sun_texture, GL_TEXTURE_2D);
 
 
 	//
 	// Todo: Create an Earth node
 	//
+    // Load the sun's texture
+    auto earth_texture = bonobo::loadTexture2D("earth_diffuse.png");
+    auto pivot = Node();
 
+    auto earth = Node();
+    earth.set_geometry(sphere);
+    earth.set_program(shader, [](GLuint /*program*/){});
 
-	glEnable(GL_DEPTH_TEST);
+    earth.add_texture("diffuse_texture", earth_texture, GL_TEXTURE_2D);
+
+    // Add node
+    auto world = Node();
+    world.add_child(&sun);
+    world.add_child(&pivot);
+    pivot.add_child(&earth);
+
+    glEnable(GL_DEPTH_TEST);
 
 	f64 ddeltatime;
 	size_t fpsSamples = 0;
@@ -127,9 +139,17 @@ edaf80::Assignment1::run()
 
 		//
 		// How-To: Translate the sun
-		//
-		sun.set_translation(glm::vec3(std::sin(nowTime), 0.0f, 0.0f));
+        //
+        //sun.set_translation(glm::vec3(std::sin(nowTime), 0.0f, 0.0f));
+        sun.rotate_y(std::sin(nowTime/(nowTime*10)));
 
+        earth.set_translation(glm::vec3(1.0f, 0.0f, 1.0f));
+        //earth.set_translation(glm::vec3(1.0f, 1.0f, 1.0f));
+        earth.set_scaling(glm::vec3(0.2f));
+        //earth.scale(glm::vec3(4.3f));
+        //earth.set_rotation_y(.7);
+        pivot.rotate_y(nowTime/(nowTime*30));
+        //earth.set_translation(glm::vec3(std::sin(nowTime), std::sin(nowTime), 4*std::sin(nowTime)));
 
 		auto const window_size = window->GetDimensions();
 		glViewport(0, 0, window_size.x, window_size.y);
@@ -154,7 +174,7 @@ edaf80::Assignment1::run()
 			//
 			// Todo: Compute the current node's world matrix
 			//
-			auto const current_node_world_matrix = current_node_matrix;
+			auto const current_node_world_matrix = parent_matrix * current_node_matrix;
 			current_node->render(mCamera.GetWorldToClipMatrix(), current_node_world_matrix);
 
 			for (int i = static_cast<int>(current_node->get_children_nb()) - 1; i >= 0; --i) {
