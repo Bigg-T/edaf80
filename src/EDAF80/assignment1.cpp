@@ -105,6 +105,7 @@ edaf80::Assignment1::run()
 
     earth.add_texture("diffuse_texture", earth_texture, GL_TEXTURE_2D);
 
+    //earth moon
     auto emarble = Node();
     auto epivot = Node();
     emarble.set_geometry(sphere);
@@ -113,12 +114,35 @@ edaf80::Assignment1::run()
     emarble.add_texture("diffuse_texture", emarble_texture, GL_TEXTURE_2D);
 
 
+    //saturn
+    auto saturn_texture = bonobo::loadTexture2D("jupiter.png");
+    auto pivot2 = Node();
+
+    auto saturn = Node();
+    saturn.set_geometry(sphere);
+    saturn.set_program(shader, [](GLuint /*program*/){});
+    saturn.add_texture("diffuse_texture", saturn_texture, GL_TEXTURE_2D);
+
+    auto sring_texture = bonobo::loadTexture2D("saturn_rings.png");
+    auto sring = Node();
+    sring.set_geometry(sphere);
+    sring.set_program(shader, [](GLuint /*program*/){});
+    sring.add_texture("diffuse_texture", saturn_texture, GL_TEXTURE_2D);
+
+
+
     // Add node
     auto world = Node();
     world.add_child(&sun);
     world.add_child(&pivot);
+    world.add_child(&pivot2);
+
     pivot.add_child(&earth);
+    pivot2.add_child(&saturn);
+
     earth.add_child(&epivot);
+    saturn.add_child(&sring);
+
     epivot.add_child(&emarble);
 
     glEnable(GL_DEPTH_TEST);
@@ -155,6 +179,7 @@ edaf80::Assignment1::run()
 
         earth.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
         emarble.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
+        saturn.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
         //earth.set_translation(glm::vec3(1.0f, 1.0f, 1.0f));
         earth.set_scaling(glm::vec3(.6f));
         emarble.set_scaling(glm::vec3(.3f));
