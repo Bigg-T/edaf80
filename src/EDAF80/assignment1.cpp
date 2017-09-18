@@ -127,7 +127,7 @@ edaf80::Assignment1::run()
     auto sring = Node();
     sring.set_geometry(sphere);
     sring.set_program(shader, [](GLuint /*program*/){});
-    sring.add_texture("diffuse_texture", saturn_texture, GL_TEXTURE_2D);
+    sring.add_texture("diffuse_texture", sring_texture, GL_TEXTURE_2D);
 
 
 
@@ -179,16 +179,19 @@ edaf80::Assignment1::run()
 
         earth.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
         emarble.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
-        saturn.set_translation(glm::vec3(2.5f, 0.0f, 1.0f));
+        saturn.set_translation(glm::vec3(4.0f, 0.0f, 1.0f));
         //earth.set_translation(glm::vec3(1.0f, 1.0f, 1.0f));
-        earth.set_scaling(glm::vec3(.6f));
-        emarble.set_scaling(glm::vec3(.3f));
+        earth.set_scaling(glm::vec3(.4f));
+        emarble.set_scaling(glm::vec3(.2f));
+        saturn.set_scaling(glm::vec3(.7f));
         //earth.scale(glm::vec3(4.3f));
         //earth.set_rotation_y(.7);
         pivot.rotate_y(nowTime/(nowTime*20));
         earth.rotate_z(nowTime/(nowTime*10));
+        pivot2.rotate_y(nowTime/(nowTime*40));
+        saturn.rotate_x(nowTime/(nowTime*30));
 
-        epivot.rotate_z(nowTime/(nowTime*24));
+//        epivot.rotate_z(nowTime/(nowTime*24));
         epivot.rotate_y(nowTime/(nowTime*10));
         //earth.set_translation(glm::vec3(std::sin(nowTime), std::sin(nowTime), 4*std::sin(nowTime)));
 
