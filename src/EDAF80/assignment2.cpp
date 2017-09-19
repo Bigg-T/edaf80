@@ -117,6 +117,16 @@ edaf80::Assignment2::run()
 	circle_rings.set_geometry(shape);
 	circle_rings.set_program(fallback_shader, set_uniforms);
 
+    auto quad = Node();
+    auto const q = parametric_shapes::createQuad(40u, 60u);
+    quad.set_geometry(q);
+    quad.set_program(fallback_shader, set_uniforms);
+
+    auto sphere = Node();
+    auto const s = parametric_shapes::createSphere(1u, 40u, 2.0f);
+    sphere.set_geometry(s);
+    sphere.set_program(fallback_shader, set_uniforms);
+
 
 	//! \todo Create a tesselated sphere and a tesselated torus
 
@@ -196,6 +206,10 @@ edaf80::Assignment2::run()
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		circle_rings.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
+
+
+        quad.render(mCamera.GetWorldToClipMatrix(), quad.get_transform());
+        sphere.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
 
 		bool const opened = ImGui::Begin("Scene Controls", nullptr, ImVec2(300, 100), -1.0f, 0);
 		if (opened) {
