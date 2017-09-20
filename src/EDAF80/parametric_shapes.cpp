@@ -136,7 +136,7 @@ bonobo::mesh_data
 parametric_shapes::createSphere(unsigned int const res_theta,
                                 unsigned int const res_phi, float const radius)
 {
-    auto const vertices_nb = radius*res_phi * res_theta;
+    auto const vertices_nb = radius * res_phi * res_theta;
 
     auto vertices  = std::vector<glm::vec3>(vertices_nb);
     auto normals   = std::vector<glm::vec3>(vertices_nb);
@@ -156,7 +156,7 @@ parametric_shapes::createSphere(unsigned int const res_theta,
         float cos_theta = std::cos(theta),
                 sin_theta = std::sin(theta);
 
-
+        phi = 0.0f;
         for (unsigned int j = 0u; j < res_phi; ++j) {
             float sin_phi = std::sin(phi),
                     cos_phi = std::cos(phi);
@@ -196,18 +196,28 @@ parametric_shapes::createSphere(unsigned int const res_theta,
 
     // generate indices iteratively
     index = 0u;
-    for (unsigned int i = 0u; i <  res_phi- 1u; ++i)
+    for (unsigned int i = 0u; i <  res_theta - 1u; ++i)
     {
-        for (unsigned int j = 0u; j < res_theta - 1u; ++j)
+        for (unsigned int j = 0u; j < res_phi - 1u; ++j)
         {
-            indices[index] = glm::uvec3(res_phi * i + j + res_theta,
-                                        res_phi * i + j + res_theta+ 1u,
-                                        res_phi * i + j + res_theta + 1u + res_phi);
+//            indices[index] = glm::uvec3(res_phi * i + j + res_theta,
+//                                        res_phi * i + j + res_theta+ 1u,
+//                                        res_phi * i + j + res_theta + 1u + res_phi);
+//            ++index;
+//
+//            indices[index] = glm::uvec3(res_phi * i + j + res_theta,
+//                                        res_phi * i + j + res_theta + res_phi + 1u,
+//                                        res_phi * i + j + res_theta + res_phi);
+//            ++index;
+
+            indices[index] = glm::uvec3(res_phi * i + j,
+                                        res_phi * i + j + 1u,
+                                        res_phi * i + j + 1u + res_phi);
             ++index;
 
-            indices[index] = glm::uvec3(res_phi * i + j + res_theta,
-                                        res_phi * i + j + res_theta + res_phi + 1u,
-                                        res_phi * i + j + res_theta + res_phi);
+            indices[index] = glm::uvec3(res_phi * i + j,
+                                        res_phi * i + j + res_phi + 1u,
+                                        res_phi * i + j + res_phi);
             ++index;
         }
     }
