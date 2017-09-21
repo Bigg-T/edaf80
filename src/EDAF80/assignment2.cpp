@@ -123,9 +123,14 @@ edaf80::Assignment2::run()
     quad.set_program(fallback_shader, set_uniforms);
     circle_rings.add_child(&quad);
     auto sphere = Node();
-    auto const s = parametric_shapes::createSphere(30u, 40u, 2.0f);
+    auto const s = parametric_shapes::createSphere(30u, 40u, 1.0f);
     sphere.set_geometry(s);
     sphere.set_program(fallback_shader, set_uniforms);
+
+    auto tor = Node();
+    auto const t = parametric_shapes::createTorus(5u, 10u, 2.0f, 3.0f);
+    tor.set_geometry(t);
+    tor.set_program(fallback_shader, set_uniforms);
 
 
 	//! \todo Create a tesselated sphere and a tesselated torus
@@ -145,73 +150,123 @@ edaf80::Assignment2::run()
 	size_t fpsSamples = 0;
 	double nowTime, lastTime = GetTimeSeconds();
 	double fpsNextTick = lastTime + 1.0;
-
+    float l_inter = 0.0f;
 	while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
-		nowTime = GetTimeSeconds();
-		ddeltatime = nowTime - lastTime;
-		if (nowTime > fpsNextTick) {
-			fpsNextTick += 1.0;
-			fpsSamples = 0;
-		}
-		fpsSamples++;
+        nowTime = GetTimeSeconds();
+        ddeltatime = nowTime - lastTime;
+        if (nowTime > fpsNextTick) {
+            fpsNextTick += 1.0;
+            fpsSamples = 0;
+        }
+        fpsSamples++;
 
-		auto& io = ImGui::GetIO();
-		inputHandler->SetUICapture(io.WantCaptureMouse, io.WantCaptureMouse);
+        auto &io = ImGui::GetIO();
+        inputHandler->SetUICapture(io.WantCaptureMouse, io.WantCaptureMouse);
 
-		glfwPollEvents();
-		inputHandler->Advance();
-		mCamera.Update(ddeltatime, *inputHandler);
+        glfwPollEvents();
+        inputHandler->Advance();
+        mCamera.Update(ddeltatime, *inputHandler);
 
-		ImGui_ImplGlfwGL3_NewFrame();
+        ImGui_ImplGlfwGL3_NewFrame();
 
 
-		if (inputHandler->GetKeycodeState(GLFW_KEY_1) & JUST_PRESSED) {
-			circle_rings.set_program(fallback_shader, set_uniforms);
-		}
-		if (inputHandler->GetKeycodeState(GLFW_KEY_2) & JUST_PRESSED) {
-			circle_rings.set_program(diffuse_shader, set_uniforms);
-		}
-		if (inputHandler->GetKeycodeState(GLFW_KEY_3) & JUST_PRESSED) {
-			circle_rings.set_program(normal_shader, set_uniforms);
-		}
-		if (inputHandler->GetKeycodeState(GLFW_KEY_4) & JUST_PRESSED) {
-			circle_rings.set_program(texcoord_shader, set_uniforms);
-		}
-		if (inputHandler->GetKeycodeState(GLFW_KEY_Z) & JUST_PRESSED) {
-			polygon_mode = get_next_mode(polygon_mode);
-		}
-		switch (polygon_mode) {
-			case polygon_mode_t::fill:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				break;
-			case polygon_mode_t::line:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				break;
-			case polygon_mode_t::point:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-				break;
-		}
+        if (inputHandler->GetKeycodeState(GLFW_KEY_1) & JUST_PRESSED) {
+            sphere.set_program(fallback_shader, set_uniforms);
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_2) & JUST_PRESSED) {
+            sphere.set_program(diffuse_shader, set_uniforms);
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_3) & JUST_PRESSED) {
+            sphere.set_program(normal_shader, set_uniforms);
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_4) & JUST_PRESSED) {
+            sphere.set_program(texcoord_shader, set_uniforms);
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_Z) & JUST_PRESSED) {
+            polygon_mode = get_next_mode(polygon_mode);
+        }
+        switch (polygon_mode) {
+            case polygon_mode_t::fill:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                break;
+            case polygon_mode_t::line:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                break;
+            case polygon_mode_t::point:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+                break;
+        }
 
-		circle_rings.rotate_y(0.01f);
+        circle_rings.rotate_y(0.01f);
         quad.set_scaling(glm::vec3(0.3f));
 
-		//! \todo Interpolate the movement of a shape between various
-		//!        control points
+        //! \todo Interpolate the movement of a shape between various
+        //!        control points
 
 
-		auto const window_size = window->GetDimensions();
-		glViewport(0, 0, window_size.x, window_size.y);
-		glClearDepthf(1.0f);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        auto const window_size = window->GetDimensions();
+        glViewport(0, 0, window_size.x, window_size.y);
+        glClearDepthf(1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-//		circle_rings.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
+        circle_rings.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
 
 
 //        quad.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
-        sphere.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
 
-		bool const opened = ImGui::Begin("Scene Controls", nullptr, ImVec2(300, 100), -1.0f, 0);
+        glm::vec3 p1 = glm::vec3(1, 2, 3);
+        glm::vec3 p2 = glm::vec3(4, 2, 3);
+
+        glm::vec3 cp[10];
+
+        cp[0] = glm::vec3(1,2,-1);
+        cp[1] = glm::vec3(4,8,2);
+        cp[2] = glm::vec3(6,3,0);
+        cp[3] = glm::vec3(6,2,7);
+        cp[4] = glm::vec3(8,-2,8);
+        cp[5] = glm::vec3(4,-2,0);
+        cp[6] = glm::vec3(0,-6,2);
+        cp[7] = glm::vec3(7,8,6);
+        cp[8] = glm::vec3(-2,-4,-2);
+        cp[9] = glm::vec3(0, 0, 0);
+
+//        cp[0] = glm::vec3(0, 1, 1);
+//        cp[1] = glm::vec3(1, 0, 0);
+//        cp[2] = glm::vec3(0, -1, 0);
+
+
+
+
+        int counter = 0;
+        if (l_inter > 10) {
+            l_inter -= 10;
+        } else {
+
+            l_inter += ddeltatime;
+
+        }
+        int in = static_cast<int>(std::floor(l_inter));
+        if (use_linear) {
+            glm::vec3 interp_me = interpolation::evalLERP(cp[in % 10], cp[(in + 1) % 10], l_inter - std::floor(l_inter));
+//            sphere.set_translation(interp_me);
+        } else {
+            glm::vec3 interp_me = interpolation::evalCatmullRom(cp[in % 10], cp[(in + 1) % 10], cp[(in + 2) % 10], cp[(in + 3) % 10], catmull_rom_tension, l_inter - std::floor(l_inter));
+//            sphere.set_translation(interp_me);
+        }
+//        glm::vec3 interp_me = interpolation::evalLERP(cp[l_inter % 10], cp[(l_inter + 1) % 10], .5);
+//        sphere.set_translation(interp_me);
+//        my_x += 0.1;
+
+//        l_inter = l_inter + 1;
+//        interp_me = interpolation::evalLERP(cp[l_inter % 2], cp[(l_inter + 1) % 2], .5);
+//        sphere.set_translation(interp_me);
+        sphere.render(mCamera.GetWorldToClipMatrix(), sphere.get_transform());
+
+//        tor.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
+
+
+        bool const opened = ImGui::Begin("Scene Controls", nullptr, ImVec2(300, 100), -1.0f, 0);
 		if (opened) {
 			ImGui::SliderFloat("Catmull-Rom tension", &catmull_rom_tension, 0.0f, 1.0f);
 			ImGui::Checkbox("Use linear interpolation", &use_linear);
