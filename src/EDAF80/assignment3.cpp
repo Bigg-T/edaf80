@@ -158,8 +158,18 @@ edaf80::Assignment3::run()
         glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, glm::value_ptr(camera_position));
     };
 
+    //***Cube Map Shader
+    auto my_bump_map_id = bonobo::loadTexture2D("earth_bump.png", true);
 
-    auto const bump_set_uniforms = [](GLuint program) {
+    auto my_bump_map_id2 = bonobo::loadTexture2D("earth_diffuse.png", true);
+
+    auto const bump_set_uniforms = [&light_position,&camera_position,&ambient,&diffuse,&specular,&shininess](GLuint program) {
+        glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+        glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, glm::value_ptr(camera_position));
+        glUniform3fv(glGetUniformLocation(program, "ambient"), 1, glm::value_ptr(ambient));
+        glUniform3fv(glGetUniformLocation(program, "diffuse"), 1, glm::value_ptr(diffuse));
+        glUniform3fv(glGetUniformLocation(program, "specular"), 1, glm::value_ptr(specular));
+        glUniform1f(glGetUniformLocation(program, "shininess"), shininess);
     };
 
 
@@ -173,12 +183,20 @@ edaf80::Assignment3::run()
 	circle_ring.set_program(fallback_shader, set_uniforms);
 
     auto sphere = Node();
-    auto const s = parametric_shapes::createSphere(30u, 40u, 1.0f);
+    auto const s = parametric_shapes::createSphere(60u, 70u, 1.0f);
     sphere.set_geometry(s);
     sphere.set_program(fallback_shader, set_uniforms);
     glm::mat3();
 
+    auto sphere2 = Node();
+    auto const s2 = parametric_shapes::createSphere(60u, 70u, 5.0f);
+    sphere2.set_geometry(s2);
+    sphere2.set_program(fallback_shader, set_uniforms);
+    glm::mat3();
+
     sphere.add_texture("my_cube_map", my_cube_map_id, GL_TEXTURE_CUBE_MAP);
+    sphere.add_texture("my_normal_map", my_bump_map_id, GL_TEXTURE_2D);
+    sphere.add_texture("my_diffuse", my_bump_map_id2, GL_TEXTURE_2D);
 
     glEnable(GL_DEPTH_TEST);
 
