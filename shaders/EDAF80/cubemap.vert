@@ -20,5 +20,5 @@ void main()
     vec3 worldPos = (vertex_model_to_world*vec4(Pos,1)).xyz;
     fs_out.N = (normal_model_to_world*vec4(Normal,0)).xyz;
     fs_out.V = camera_position - worldPos;
-    gl_Position = vertex_world_to_clip*vec4(Pos,1);
+    gl_Position = vertex_world_to_clip*vec4(worldPos,1);
 }

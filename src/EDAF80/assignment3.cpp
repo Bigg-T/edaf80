@@ -186,17 +186,25 @@ edaf80::Assignment3::run()
     auto const s = parametric_shapes::createSphere(60u, 70u, 1.0f);
     sphere.set_geometry(s);
     sphere.set_program(fallback_shader, set_uniforms);
+
     glm::mat3();
 
     auto sphere2 = Node();
     auto const s2 = parametric_shapes::createSphere(60u, 70u, 5.0f);
     sphere2.set_geometry(s2);
-    sphere2.set_program(fallback_shader, set_uniforms);
+    sphere2.set_program(cube_shader, cube_set_uniforms);
     glm::mat3();
+    sphere2.set_scaling(glm::vec3(10));
 
     sphere.add_texture("my_cube_map", my_cube_map_id, GL_TEXTURE_CUBE_MAP);
     sphere.add_texture("my_normal_map", my_bump_map_id, GL_TEXTURE_2D);
     sphere.add_texture("my_diffuse", my_bump_map_id2, GL_TEXTURE_2D);
+
+
+    sphere2.add_texture("my_cube_map", my_cube_map_id, GL_TEXTURE_CUBE_MAP);
+    sphere2.add_texture("my_normal_map", my_bump_map_id, GL_TEXTURE_2D);
+    sphere2.add_texture("my_diffuse", my_bump_map_id2, GL_TEXTURE_2D);
+
 
     glEnable(GL_DEPTH_TEST);
 
@@ -226,7 +234,7 @@ edaf80::Assignment3::run()
 		glfwPollEvents();
 		inputHandler->Advance();
 		mCamera.Update(ddeltatime, *inputHandler);
-
+        sphere2.set_translation(mCamera.mWorld.GetTranslation());
 		ImGui_ImplGlfwGL3_NewFrame();
 
 		if (inputHandler->GetKeycodeState(GLFW_KEY_1) & JUST_PRESSED) {
@@ -278,6 +286,7 @@ edaf80::Assignment3::run()
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		sphere.render(mCamera.GetWorldToClipMatrix(), sphere.get_transform());
+        sphere2.render(mCamera.GetWorldToClipMatrix(), sphere2.get_transform());
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
