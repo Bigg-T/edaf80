@@ -15,9 +15,12 @@
 #include "external/imgui_impl_glfw_gl3.h"
 
 #include "external/glad/glad.h"
+#include "parametric_shapes.hpp"
 #include <GLFW/glfw3.h>
 
 #include <stdexcept>
+#include <core/node.hpp>
+#include <glm/src/glm/glm/gtc/type_ptr.hpp>
 
 edaf80::Assignment4::Assignment4()
 {
@@ -62,13 +65,37 @@ edaf80::Assignment4::run()
 		LogError("Failed to load fallback shader");
 		return;
 	}
-	auto const reload_shaders = [](){
-		//
-		// Todo: Insert the creation of other shader programs.
-		//       (Check how it was done in assignment 3.)
-		//
-	};
-	reload_shaders();
+
+    GLuint water_shader = 0u;
+    auto const reload_shaders = [&water_shader](){
+        if (water_shader != 0u)
+            glDeleteProgram(water_shader);
+        water_shader = bonobo::createProgram("water.vert", "water.frag");
+        if (water_shader == 0u)
+            LogError("Failed to load water map shader");
+
+    };
+    reload_shaders();
+
+
+    auto light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
+    auto const set_uniforms = [&light_position](GLuint program) {
+        glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+    };
+
+    auto camera_position = mCamera.mWorld.GetTranslation();
+    float u_time = (float) GetTimeSeconds();
+    auto const water_set_uniforms = [&camera_position, &u_time](GLuint program) {
+        glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, glm::value_ptr(camera_position));
+        glUniform1f(glGetUniformLocation(program, "u_time"), u_time);
+    };
+
+    auto quad_shape = parametric_shapes::createQuad(40u, 40u);
+    auto quad = Node();
+    quad.set_geometry(quad_shape);
+    quad.set_program(fallback_shader, water_set_uniforms);
+
+
 
 	//
 	// Todo: Load your geometry
@@ -108,6 +135,9 @@ edaf80::Assignment4::run()
 		//
 		// Todo: If you need to handle inputs, you can do it here
 		//
+        if (inputHandler->GetKeycodeState(GLFW_KEY_5) & JUST_PRESSED) {
+            quad.set_program(water_shader, water_set_uniforms);
+        }
 		if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
 			reload_shaders();
 		}
@@ -122,6 +152,9 @@ edaf80::Assignment4::run()
 		//
 		// Todo: Render all your geometry here.
 		//
+
+
+        quad.render(mCamera.GetWorldToClipMatrix(), quad.get_transform());
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -138,6 +171,11 @@ edaf80::Assignment4::run()
 		lastTime = nowTime;
 	}
 
+
+    glDeleteProgram(fallback_shader);
+    fallback_shader = 0u;
+    glDeleteProgram(water_shader);
+    water_shader = 0u;
 	//
 	// Todo: Do not forget to delete your shader programs, by calling
 	//       `glDeleteProgram($your_shader_program)` for each of them.
