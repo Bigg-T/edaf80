@@ -20,7 +20,7 @@ void main()
 
     vec2 amplitude = vec2(1.0, 0.5);
     vec2 f = vec2(0.2, 0.4);
-    vec2 phase = vec2(0.5, 1.3);
+    vec2 phgase = vec2(0.5, 1.3);
     vec2 sharpness = vec2(2.0, 2.0); //k
     vec2 dir1 = vec2(-1.0, 0.0);
     vec2 dir2 = vec2(-0.7, 0.7);
