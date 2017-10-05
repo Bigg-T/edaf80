@@ -13,6 +13,15 @@ namespace parametric_shapes
 	//!         data
 	bonobo::mesh_data createQuad(unsigned int width, unsigned int height);
 
+	//! \brief Create a quad consisting of two triangles and make it
+	//!        available to OpenGL.
+	//!
+	//! @param width the width of the quad
+	//! @param height the height of the quad
+	//! @return wrapper around OpenGL objects' name containing the geometry
+	//!         data
+	bonobo::mesh_data createHQuad(unsigned int width, unsigned int height);
+
 	//! \brief Create a sphere for some tesselation level and make it
 	//!        available to OpenGL.
 	//!

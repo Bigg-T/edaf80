@@ -132,6 +132,188 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height)
 	return data;
 }
 
+
+
+
+bonobo::mesh_data
+parametric_shapes::createHQuad(unsigned int width, unsigned int height)
+{
+    //! \todo Fill in the blanks
+
+    auto vertices = std::vector<glm::uvec3>(height * width);
+//    auto const vertices = std::array<glm::vec3, 4>{
+//            glm::vec3(0.0f,                      0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width), 0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width), 0.0f, static_cast<float>(height)),
+//            glm::vec3(0.0f,                     0.0f,  static_cast<float>(height))
+//    };
+
+
+//    auto const vertices = std::array<glm::vec3, 4>{
+//            glm::vec3(0.0f,                      0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width)/2, 0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width)/2, 0.0f, static_cast<float>(height)),
+//            glm::vec3(0.0f,                     0.0f,  static_cast<float>(height)),
+//
+//
+//            glm::vec3(0.0f,                      0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width), 0.0f,                       0.0f),
+//            glm::vec3(static_cast<float>(width), 0.0f, static_cast<float>(height)),
+//            glm::vec3(0.0f,                     0.0f,  static_cast<float>(height)),
+//    };
+//
+    int idx = 0u;
+    for (unsigned int i = 0u; i < width; ++i) {
+        for (unsigned int j = 0u; j < height; ++j) {
+//            vertices[idx] = glm::vec3((static_cast<float>(i), 0.0f,0.0f));
+////            idx++;
+//            vertices[index] = glm::vec3(radius * sin_theta * sin_phi,
+//                                        -radius * cos_phi ,
+//                                        radius * cos_theta * sin_phi);
+            vertices[idx] = glm::vec3(static_cast<float>(i), 0.0f, static_cast<float>(j));
+//            glm::vec3(0.0f,                      0.0f,                       0.0f),
+//                    glm::vec3(static_cast<float>(width), 0.0f,                       0.0f),
+//                    glm::vec3(static_cast<float>(width), 0.0f, static_cast<float>(height)),
+//                    glm::vec3(0.0f,                     0.0f,  static_cast<float>(height))
+            idx++;
+        }
+    }
+
+
+//    auto const indices = std::array<glm::uvec3, 2>{
+//            glm::uvec3(0u, 1u, 2u),
+//            glm::uvec3(0u, 2u, 3u)
+//    };
+
+    // create index array
+    auto indices = std::vector<glm::uvec3>(2u * (height-1u)  *( width-1u) );
+
+    // generate indices iteratively
+
+    int index = 0u;
+    for (unsigned int i = 0u; i < width - 1u; ++i)
+    {
+        for (unsigned int j = 0u; j < height - 1u; ++j)
+        {
+            indices[index] = glm::uvec3(height * i + j,
+                                        height * i + j + 1u,
+                                        height * i + j + 1u + height);
+            ++index;
+
+            indices[index] = glm::uvec3(height * i + j,
+                                        height * i + j + height + 1u,
+                                        height * i + j + height);
+            ++index;
+
+        }
+    }
+
+    bonobo::mesh_data data;
+
+    data.vertices_nb = static_cast<GLsizeiptr>(vertices.size() * sizeof(glm::vec3));
+    //
+    // NOTE:
+    //
+    // Only the values preceeded by a `\todo` tag should be changed, the
+    // other ones are correct!
+    //
+
+    // Create a Vertex Array Object: it will remember where we stored the
+    // data on the GPU, and  which part corresponds to the vertices, which
+    // one for the normals, etc.
+    //
+    // The following function will create new Vertex Arrays, and pass their
+    // name in the given array (second argument). Since we only need one,
+    // pass a pointer to `data.vao`.
+//	glGenVertexArrays(1, /*! \todo fill me */nullptr);
+    glGenVertexArrays(1, &data.vao);
+    // To be able to store information, the Vertex Array has to be bound
+    // first.
+//	glBindVertexArray(/*! \todo bind the previously generated Vertex Array */0u);
+
+    glBindVertexArray(data.vao);
+
+    // To store the data, we need to allocate buffers on the GPU. Let's
+    // allocate a first one for the vertices.
+    //
+    // The following function's syntax is similar to `glGenVertexArray()`:
+    // it will create multiple OpenGL objects, in this case buffers, and
+    // return their names in an array. Have the buffer's name stored into
+    // `data.bo`.
+//	glGenBuffers(1, /*! \todo fill me */nullptr);
+    glGenBuffers(1, &data.bo);
+    // Similar to the Vertex Array, we need to bind it first before storing
+    // anything in it. The data stored in it can be interpreted in
+    // different ways. Here, we will say that it is just a simple 1D-array
+    // and therefore bind the buffer to the corresponding target.
+//	glBindBuffer(GL_ARRAY_BUFFER, /*! \todo bind the previously generated Buffer */0u);
+
+    glBindBuffer(GL_ARRAY_BUFFER, /*! \todo bind the previously generated Buffer */data.bo);
+//	glBufferData(GL_ARRAY_BUFFER, /*! \todo how many bytes should the buffer contain? */0u,
+//	             /* where is the data stored on the CPU? */vertices.data(),
+//	             /* inform OpenGL that the data is modified once, but used often */GL_STATIC_DRAW);
+
+    glBufferData(GL_ARRAY_BUFFER, /*! \todo how many bytes should the buffer contain? */data.vertices_nb,
+            /* where is the data stored on the CPU? */vertices.data(),
+            /* inform OpenGL that the data is modified once, but used often */GL_STATIC_DRAW);
+
+    // Vertices have been just stored into a buffer, but we still need to
+    // tell Vertex Array where to find them, and how to interpret the data
+    // within that buffer.
+    //
+    // You will see shaders in more detail in lab 3, but for now they are
+    // just pieces of code running on the GPU and responsible for moving
+    // all the vertices to clip space, and assigning a colour to each pixel
+    // covered by geometry.
+    // Those shaders have inputs, some of them are the data we just stored
+    // in a buffer object. We need to tell the Vertex Array which inputs
+    // are enabled, and this is done by the following line of code, which
+    // enables the input for vertices:
+    glEnableVertexAttribArray(static_cast<unsigned int>(bonobo::shader_bindings::vertices));
+
+    // Once an input is enabled, we need to explain where the data comes
+    // from, and how it interpret it. When calling the following function,
+    // the Vertex Array will automatically use the current buffer bound to
+    // GL_ARRAY_BUFFER as its source for the data. How to interpret it is
+    // specified below:
+    glVertexAttribPointer(static_cast<unsigned int>(bonobo::shader_bindings::vertices),
+            /*! \todo how many components do our vertices have? */3u,
+            /* what is the type of each component? */GL_FLOAT,
+            /* should it automatically normalise the values stored */GL_FALSE,
+            /* once all components of a vertex have been read, how far away (in bytes) is the next vertex? */0,
+            /* how far away (in bytes) from the start of the buffer is the first vertex? */reinterpret_cast<GLvoid const*>(0x0));
+
+    // Now, let's allocate a second one for the indices.
+    //
+    // Have the buffer's name stored into `data.ibo`.
+//	glGenBuffers(1, /*! \todo fill me */nullptr);
+
+    glGenBuffers(1, /*! \todo fill me */&data.ibo);
+
+    data.indices_nb = /*! \todo how many indices do we have? */indices.size() * 3u;
+    // We still want a 1D-array, but this time it should be a 1D-array of
+    // elements, aka. indices!
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, /*! \todo bind the previously generated Buffer */0u);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, /*! \todo bind the previously generated Buffer */data.ibo);
+
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, /*! \todo how many bytes should the buffer contain? */0u,
+//	             /* where is the data stored on the CPU? */indices.data(),
+//	             /* inform OpenGL that the data is modified once, but used often */GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, /*! \todo how many bytes should the buffer contain? */data.indices_nb,
+            /* where is the data stored on the CPU? */indices.data(),
+            /* inform OpenGL that the data is modified once, but used often */GL_STATIC_DRAW);
+
+
+
+    // All the data has been recorded, we can unbind them.
+    glBindVertexArray(0u);
+    glBindBuffer(GL_ARRAY_BUFFER, 0u);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
+
+    return data;
+}
+
 bonobo::mesh_data
 parametric_shapes::createSphere(unsigned int const res_theta,
                                 unsigned int const res_phi, float const radius)
