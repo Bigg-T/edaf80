@@ -105,7 +105,7 @@ edaf80::Assignment4::run()
     auto polygon_mode = polygon_mode_t::fill;
 
 
-    auto quad_shape = parametric_shapes::createHQuad(40u, 40u);
+    auto quad_shape = parametric_shapes::createHQuad(20u, 20u);
     auto quad = Node();
     quad.set_geometry(quad_shape);
     quad.set_program(water_shader, water_set_uniforms);
@@ -146,12 +146,13 @@ edaf80::Assignment4::run()
 
 		auto& io = ImGui::GetIO();
 		inputHandler->SetUICapture(io.WantCaptureMouse, io.WantCaptureMouse);
-
-		glfwPollEvents();
+        glfwPollEvents();
 		inputHandler->Advance();
 		mCamera.Update(ddeltatime, *inputHandler);
 
-		ImGui_ImplGlfwGL3_NewFrame();
+        camera_position = mCamera.mWorld.GetTranslation();
+
+        ImGui_ImplGlfwGL3_NewFrame();
 
 		//
 		// Todo: If you need to handle inputs, you can do it here
@@ -190,9 +191,9 @@ edaf80::Assignment4::run()
 		//
 
 
-        circle_rings.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
-
-        quad.render(mCamera.GetWorldToClipMatrix(), quad.get_transform());
+//        circle_rings.render(mCamera.GetWorldToClipMatrix(), circle_rings.get_transform());
+//
+//        quad.render(mCamera.GetWorldToClipMatrix(), quad.get_transform());
         quad.render(mCamera.GetWorldToClipMatrix(), quad.get_transform());
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

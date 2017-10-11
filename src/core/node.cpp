@@ -10,6 +10,11 @@ Node::Node() : _vao(0u), _vertices_nb(0u), _indices_nb(0u), _drawing_mode(GL_TRI
 {
 }
 
+Node::Node(float r) : _vao(0u), _vertices_nb(0u), _indices_nb(0u), _drawing_mode(GL_TRIANGLES), _has_indices(true), _program(0u), _textures(), _scaling(1.0f, 1.0f, 1.0f), _rotation(), _translation(), _children()
+{
+    _r = r;
+}
+
 void
 Node::render(glm::mat4 const& WVP, glm::mat4 const& world) const
 {
@@ -155,4 +160,9 @@ Node::get_transform() const
 
 	// Todo: Compute the correct transform matrix
 	return translating * rotating * scaling;
+}
+
+glm::vec3
+Node::get_translation() const{
+	return _translation;
 }

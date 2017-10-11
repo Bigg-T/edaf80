@@ -20,6 +20,11 @@ public:
 	//! \brief Default constructor.
 	Node();
 
+    //! \brief Default constructor.
+    Node(float r);
+
+    float _r = 100.0f;
+
 	//! \brief Render this node.
 	//!
 	//! @param [in] WVP Matrix transforming from world-space to clip-space
@@ -164,6 +169,10 @@ public:
 	//! @return the composition of the rotation, scaling and translation
 	//!         transformations; this is the model matrix of this node
 	glm::mat4x4 get_transform() const;
+
+	glm::vec3 get_translation() const;
+
+
 
 private:
 	// Geometry data
