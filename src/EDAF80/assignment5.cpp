@@ -195,6 +195,20 @@ edaf80::Assignment5::run()
 	// Todo: Load your geometry
 	//
 
+    auto s43_text = bonobo::loadTexture2D("stone43_bump.png", true);
+    auto s43_dif = bonobo::loadTexture2D("stone43_diffuse.png", true);
+
+    auto s47_text = bonobo::loadTexture2D("stone47_bump.png",true);
+    auto s47_dif = bonobo::loadTexture2D("stone47_diffuse.png", true);
+
+    auto fs_text = bonobo::loadTexture2D("fieldstone_bump.png", true);
+    auto fs_dif = bonobo::loadTexture2D("fieldstone_bump.png", true);
+
+    GLuint text[8] = {my_bump_map_id, my_bump_map_id2, s43_text, s43_dif, s47_text, s47_dif, fs_text, fs_dif};
+
+    GLuint texture_type;
+    GLuint diffuse_type;
+
     //Load asteroids
 	auto ast_par = Node();
     int ast_num = 20;
@@ -205,10 +219,33 @@ edaf80::Assignment5::run()
         auto const s = parametric_shapes::createSphere(6u, 7u, radius);
         ast.set_geometry(s);
         ast.set_program(bump_shader, set_uniforms);
-
+        auto scale = static_cast<float >(rand() % 1 + 0.7) + 0.5f;
+        ast.set_scaling(glm::vec3(scale));
         //todo randomize texture for variety of texture
-        ast.add_texture("my_normal_map", my_bump_map_id, GL_TEXTURE_2D);
-        ast.add_texture("my_diffuse", my_bump_map_id2, GL_TEXTURE_2D);
+
+        switch (rand() % 3) {
+            case 0:
+                texture_type = text[0];
+                diffuse_type = text[1];
+                break;
+            case 1:
+                texture_type = text[2];
+                diffuse_type = text[3];
+                break;
+            case 2:
+                texture_type = text[4];
+                diffuse_type = text[5];
+                break;
+            default:
+                texture_type = text[6];
+                diffuse_type = text[7];
+                break;
+
+        }
+        ast.add_texture("my_normal_map", texture_type, GL_TEXTURE_2D);
+        ast.add_texture("my_diffuse", diffuse_type, GL_TEXTURE_2D);
+
+
         asteroids[i-1] = ast;
         ast_par.add_child(&ast);
     }
@@ -417,11 +454,12 @@ edaf80::Assignment5::run()
             }
         }
 
+        float fall_speed = 0.05f;
         //fall of solar systems
         for (int i = 0; i < ast_num; i++ ) {
             asteroids[i].rotate_x(nowTime/(nowTime*20));
             asteroids[i].rotate_y(nowTime/(nowTime*10));
-            asteroids[i].translate(glm::vec3(0,-0.05f,0));
+            asteroids[i].translate(glm::vec3(0,-fall_speed,0));
         }
 
 		//reset planets that fall below y < -3
@@ -578,12 +616,13 @@ edaf80::Assignment5::run()
 
         bool const opened = ImGui::Begin("Game Controls", nullptr, ImVec2(300, 100), -1.0f, 0);
         if (opened) {
-//            ImGui::SliderFloat("Catmull-Rom tension", &catmull_rom_tension, 0.0f, 1.0f);
 //            ImGui::Checkbox("Use linear interpolation", &use_linear);
 
 //            char * text = (char) std::to_string(my_score);
 
 
+            //speed of asteroid
+            ImGui::SliderFloat("Falling Speed", &fall_speed, 0.05f, 1.5f);
             // score board
             std::string s = "My Score " + std::to_string(my_score);
             char const *score = s.c_str();
