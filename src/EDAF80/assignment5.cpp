@@ -351,6 +351,7 @@ edaf80::Assignment5::run()
     int my_lives = 3;
 
     float l_inter = 0.0f;
+    float fall_speed = 0.05f;
 	while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
 		nowTime = GetTimeMilliseconds();
 		ddeltatime = nowTime - lastTime;
@@ -417,6 +418,19 @@ edaf80::Assignment5::run()
         }
         if (inputHandler->GetKeycodeState(GLFW_KEY_B) & JUST_PRESSED) {
             //setting the planets coords
+            if (my_lives > 0) {
+                for (int i = 1; i <= ast_num; i++) {
+                    float x = static_cast<float >(std::floor(i));
+                    printf("ran here\n");
+                    float yCoord = static_cast<float >(rand() % 30 + 10);
+                    float xCoord = static_cast<float >(rand() % 20 - 10);
+                    asteroids[i - 1].set_translation(glm::vec3(xCoord, yCoord, 0.0f));
+                }
+                ship.set_translation(glm::vec3(0, -4, 0));
+            }
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_N) & JUST_PRESSED) { //reset game
+            //setting the planets coords
             for (int i = 1; i <= ast_num; i++ ) {
                 float x = static_cast<float >(std::floor(i));
                 printf("ran here\n");
@@ -425,6 +439,9 @@ edaf80::Assignment5::run()
                 asteroids[i - 1].set_translation(glm::vec3(xCoord, yCoord, 0.0f));
             }
             ship.set_translation(glm::vec3(0, -4, 0));
+            my_lives = 3;
+            my_score = 0;
+
         }
 
         // fire bullet,
@@ -454,7 +471,7 @@ edaf80::Assignment5::run()
             }
         }
 
-        float fall_speed = 0.05f;
+
         //fall of solar systems
         for (int i = 0; i < ast_num; i++ ) {
             asteroids[i].rotate_x(nowTime/(nowTime*20));
